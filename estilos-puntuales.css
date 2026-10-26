@@ -1,34 +1,751 @@
+/**
+ * estilos-puntuales.css
+ * Capa visual del formulario: fondo aurora pastel, tarjeta glass,
+ * scroll interno, controles, estados de validacion y scrollbar
+ * auto-oculta. Se carga DESPUES de tailwind.css, por lo que estas
+ * reglas sobrescriben las utilidades de Tailwind sin !important.
+ * No se usan estilos inline (compatible con la CSP estricta).
+ */
 
-.errorValidacion {
-  border-color: #f43f5e;
+/* ==========================================================
+   1. TOKENS DE DISENO
+   ========================================================== */
+:root {
+  color-scheme: light;
+
+  --fondo-1: #eef6ff;
+  --fondo-2: #f7f3ff;
+  --fondo-3: #fff8f3;
+
+  --tinta: #2f3b52;
+  --tinta-suave: #5a6b82;
+  --acento: #4f6f96;
+  --borde: #7d8fa8;
+  --error: #a63d50;
+  --exito: #2d7a5b;
+  --foco: #3f5f86;
+
+  --boton-1: #4f6f96;
+  --boton-2: #3f5f86;
+  --boton-hover-1: #56789f;
+  --boton-hover-2: #46678e;
+
+  --lavanda: #c7b8ea;
+  --menta: #b8e0d2;
+  --cielo: #b8d8f0;
+  --durazno: #f6d6c9;
+
+  --superficie-control: rgba(255, 255, 255, 0.66);
+  --borde-suave: rgba(125, 143, 168, 0.24);
+
+  --radio-tarjeta: clamp(1.35rem, 3vw, 1.75rem);
+  --radio-control: 0.8rem;
+  --pad-tarjeta: clamp(1.25rem, 4vw, 2rem);
+  --pad-pagina: 1rem;
+  --scrollbar-size: 10px;
+
+  --sombra-tarjeta:
+    0 30px 80px -24px rgba(47, 59, 82, 0.38),
+    0 10px 30px -12px rgba(47, 59, 82, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  --sombra-foco: 0 0 0 3px rgba(63, 95, 134, 0.16);
+}
+
+@media (max-width: 480px) {
+  :root {
+    --pad-pagina: 0.75rem;
+  }
+}
+
+/* ==========================================================
+   2. PAGINA, FONDO Y TARJETA GLASS
+   ========================================================== */
+html {
+  height: 100%;
+  background: var(--fondo-1);
+}
+
+body.app-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  padding: var(--pad-pagina);
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--tinta);
+  background: linear-gradient(
+    145deg,
+    var(--fondo-1) 0%,
+    var(--fondo-2) 52%,
+    var(--fondo-3) 100%
+  );
+}
+
+/* Manchas pastel estaticas: gradientes suaves, sin filter: blur(). */
+body.app-shell::before,
+body.app-shell::after {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.app-shell::before {
+  inset: -12%;
+  background:
+    radial-gradient(38% 34% at 16% 18%, rgba(199, 184, 234, 0.72), transparent 72%),
+    radial-gradient(34% 32% at 82% 14%, rgba(184, 216, 240, 0.68), transparent 72%),
+    radial-gradient(38% 38% at 78% 86%, rgba(184, 224, 210, 0.58), transparent 74%),
+    radial-gradient(32% 30% at 14% 86%, rgba(246, 214, 201, 0.7), transparent 72%);
+}
+
+body.app-shell::after {
+  inset: 0;
+  opacity: 0.8;
+  background: radial-gradient(
+    60% 55% at 50% 12%,
+    rgba(255, 255, 255, 0.55),
+    transparent 70%
+  );
+}
+
+.form-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 42rem;
+  min-height: 0;
+  max-height: calc(100vh - var(--pad-pagina) - var(--pad-pagina));
+  max-height: calc(100dvh - var(--pad-pagina) - var(--pad-pagina));
+  padding: var(--pad-tarjeta);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable both-edges;
+  scroll-padding-block: 1.25rem;
+  -webkit-overflow-scrolling: touch;
+  color: var(--tinta);
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.84),
+    rgba(255, 255, 255, 0.58)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: var(--radio-tarjeta);
+  box-shadow: var(--sombra-tarjeta);
+  backdrop-filter: blur(18px) saturate(125%);
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+}
+
+/* El gutter de la barra se reserva fuera del padding: se compensa
+ * en escritorio para conservar el ancho util y el centrado. */
+@supports (scrollbar-gutter: stable both-edges) {
+  @media (hover: hover) and (pointer: fine) {
+    .form-panel {
+      padding-inline: calc(var(--pad-tarjeta) - var(--scrollbar-size));
+    }
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .form-panel {
+    background: linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.98),
+      rgba(255, 255, 255, 0.94)
+    );
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .form-panel {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* ==========================================================
+   3. ENCABEZADO Y TITULOS DE SECCION
+   ========================================================== */
+.form-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form-title {
+  margin: 0;
+  color: var(--tinta);
+  font-size: clamp(1.55rem, 5vw, 1.95rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.form-subtitle {
+  max-width: 32rem;
+  margin: 0.55rem auto 0;
+  color: var(--tinta-suave);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1rem;
+  color: var(--acento);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.section-title::before {
+  flex-shrink: 0;
+  width: 0.35rem;
+  height: 0.95rem;
+  content: "";
+  background: linear-gradient(180deg, var(--lavanda), var(--menta));
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(79, 111, 150, 0.08);
+}
+
+/* ==========================================================
+   4. GRUPOS, ETIQUETAS Y CONTROLES
+   ========================================================== */
+fieldset {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  /* Sin margin: 0 para no anular mb-4 de Tailwind. */
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--tinta);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.group-legend {
+  display: block;
+  padding: 0;
+  margin-bottom: 0.55rem;
+  color: var(--tinta);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.field-control {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.62rem 0.85rem;
+  color: var(--tinta);
+  font-size: 1rem;
+  line-height: 1.4;
+  caret-color: var(--acento);
+  background-color: var(--superficie-control);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-control);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.field-control::placeholder {
+  color: #5f6f86;
+  opacity: 1;
+}
+
+select.field-control {
+  padding-right: 2.2rem;
+}
+
+.field-control:hover {
+  border-color: #6f83a0;
+}
+
+.field-control:focus {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: var(--foco);
+  outline: none;
+  box-shadow: var(--sombra-foco);
+}
+
+.field-control:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 2px;
+}
+
+.field-control:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Autofill: mantiene el texto y el fondo claros en Chrome/Edge. */
+.field-control:-webkit-autofill,
+.field-control:-webkit-autofill:hover,
+.field-control:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--tinta);
+  caret-color: var(--tinta);
+  -webkit-box-shadow: 0 0 0 1000px #fbfdff inset;
+}
+
+/* ==========================================================
+   5. RADIOS Y CHECKBOXES TIPO CHIP
+   ========================================================== */
+.choice-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.choice-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.8rem;
+  color: var(--tinta);
+  cursor: pointer;
+  user-select: none;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid var(--borde-suave);
+  border-radius: 999px;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.choice-chip:hover {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(79, 111, 150, 0.35);
+}
+
+.choice-chip:has(input:checked) {
+  background: rgba(199, 184, 234, 0.3);
+  border-color: rgba(79, 111, 150, 0.42);
+}
+
+.choice-chip:has(input:focus-visible) {
+  outline: 3px solid var(--foco);
+  outline-offset: 2px;
+}
+
+.choice-chip:has(input:focus-visible) .choice-input {
+  outline: none;
+}
+
+.choice-input {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--acento);
+}
+
+.choice-input:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 2px;
+}
+
+.choice-text {
+  color: var(--tinta);
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+@media (pointer: coarse) {
+  .choice-chip {
+    min-height: 2.75rem;
+  }
+}
+
+/* ==========================================================
+   6. TERMINOS Y CONDICIONES
+   ========================================================== */
+.terms-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  cursor: pointer;
+}
+
+.terms-label .choice-input {
+  margin-top: 0.15rem;
+}
+
+.terms-label .choice-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media (pointer: coarse) {
+  .terms-label {
+    min-height: 2.75rem;
+    padding-block: 0.3rem;
+  }
+}
+
+/* ==========================================================
+   7. MENSAJES DE VALIDACION Y ESTADOS
+   ========================================================== */
+.field-message {
+  margin-top: 0.35rem;
+  color: var(--error);
+  font-size: 0.83rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.field-message.hidden {
+  display: none;
+}
+
+.terms-message {
+  margin-left: 1.75rem;
+}
+
+/* Inputs y selects */
+.field-control.errorValidacion {
   background-color: #fff1f2;
+  border-color: var(--error);
 }
 
-.errorValidacion:focus {
-  border-color: #f43f5e;
-  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+.field-control.errorValidacion:focus {
+  background-color: #fff1f2;
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(166, 61, 80, 0.14);
 }
 
-.exitoValidacion {
-  border-color: #10b981;
+.field-control.exitoValidacion {
+  background-color: #ecfdf5;
+  border-color: var(--exito);
+}
+
+.field-control.exitoValidacion:focus {
   background-color: #ecfdf5;
 }
 
-.exitoValidacion:focus {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+/* Grupos: se tinen los chips y el texto, sin caja alrededor. */
+fieldset.errorValidacion .choice-chip {
+  background: rgba(255, 241, 242, 0.82);
+  border-color: rgba(166, 61, 80, 0.45);
 }
 
-.errorValidacion > label {
-  border: 1px solid #f43f5e;
-  border-radius: 0.5rem;
-  padding: 0.35rem 0.6rem;
-  background-color: #fff1f2;
+fieldset.errorValidacion .choice-text {
+  color: var(--error);
 }
 
-.exitoValidacion > label {
-  border: 1px solid #10b981;
-  border-radius: 0.5rem;
-  padding: 0.35rem 0.6rem;
-  background-color: #ecfdf5;
+fieldset.errorValidacion .choice-input {
+  accent-color: var(--error);
+}
+
+/* ==========================================================
+   8. FORTALEZA DE CONTRASENA
+   ========================================================== */
+.strength-track {
+  width: 100%;
+  height: 0.375rem;
+  overflow: hidden;
+  background: rgba(125, 143, 168, 0.22);
+  border-radius: 999px;
+}
+
+.fortaleza-barra {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  transition:
+    width 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.fortaleza-barra.nivel-1 {
+  width: 35%;
+  background-color: #b45a63;
+}
+
+.fortaleza-barra.nivel-2 {
+  width: 70%;
+  background-color: #9a6a1f;
+}
+
+.fortaleza-barra.nivel-3 {
+  width: 100%;
+  background-color: var(--exito);
+}
+
+.strength-text {
+  margin-top: 0.3rem;
+  color: var(--tinta-suave);
+  font-size: 0.75rem;
+}
+
+/* ==========================================================
+   9. BOTON Y MENSAJE DE EXITO
+   ========================================================== */
+.btn-submit {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.8rem 1.25rem;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--boton-1), var(--boton-2));
+  border: 0;
+  border-radius: 0.85rem;
+  box-shadow:
+    0 12px 24px -12px rgba(63, 95, 134, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.btn-submit:hover {
+  background: linear-gradient(135deg, var(--boton-hover-1), var(--boton-hover-2));
+  transform: translateY(-1px);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+.btn-submit:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 3px;
+}
+
+.form-success {
+  padding: 0.85rem 1rem;
+  margin: 1rem 0 0;
+  color: var(--exito);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  background: rgba(236, 253, 245, 0.9);
+  border: 1px solid rgba(45, 122, 91, 0.22);
+  border-radius: 0.85rem;
+}
+
+.form-success.hidden {
+  display: none;
+}
+
+/* ==========================================================
+   10. SCROLLBAR AUTO-OCULTA
+   En reposo ocupa su espacio pero es transparente. La clase
+   .scroll-auto-hide la activa desde JS; si JS no se ejecuta,
+   la barra permanece visible y se puede arrastrar.
+   ========================================================== */
+#formulario::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+#formulario::-webkit-scrollbar-track,
+#formulario::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+#formulario::-webkit-scrollbar-thumb {
+  min-height: 2.5rem;
+  background-color: var(--acento);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+
+#formulario.scroll-auto-hide::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+#formulario.scroll-auto-hide.is-scrolling::-webkit-scrollbar-thumb {
+  background-color: var(--acento);
+}
+
+/* Firefox: scrollbar-width/color solo se aplican en Gecko para no
+ * desactivar los pseudo-elementos ::-webkit-scrollbar en Chromium. */
+@supports (-moz-appearance: none) {
+  #formulario {
+    scrollbar-width: thin;
+    scrollbar-color: var(--acento) transparent;
+  }
+
+  #formulario.scroll-auto-hide {
+    scrollbar-color: transparent transparent;
+  }
+
+  #formulario.scroll-auto-hide.is-scrolling {
+    scrollbar-color: var(--acento) transparent;
+  }
+}
+
+/* ==========================================================
+   11. FOCO, SELECCION Y SCROLL DE CAMPOS
+   ========================================================== */
+.field-control,
+.choice-chip,
+.terms-label {
+  scroll-margin-block: 1.25rem;
+}
+
+::selection {
+  color: var(--tinta);
+  background: rgba(199, 184, 234, 0.55);
+}
+
+/* ==========================================================
+   12. PREFERENCIAS Y FALLBACKS
+   ========================================================== */
+@media (max-width: 640px) {
+  .form-panel {
+    backdrop-filter: blur(12px) saturate(120%);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+  }
+
+  .form-title {
+    font-size: 1.45rem;
+  }
+
+  .form-header {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-control,
+  .choice-chip,
+  .btn-submit,
+  .fortaleza-barra {
+    transition: none;
+  }
+
+  .btn-submit:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .form-panel {
+    background: #ffffff;
+    border-color: var(--tinta);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .field-control,
+  .choice-chip {
+    background: #ffffff;
+    border-color: var(--tinta);
+  }
+
+  .form-subtitle,
+  .strength-text {
+    color: var(--tinta);
+  }
+
+  #formulario::-webkit-scrollbar-thumb,
+  #formulario.scroll-auto-hide::-webkit-scrollbar-thumb {
+    background-color: var(--tinta);
+  }
+
+  @supports (-moz-appearance: none) {
+    #formulario,
+    #formulario.scroll-auto-hide {
+      scrollbar-color: var(--tinta) transparent;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  body.app-shell {
+    background: Canvas;
+  }
+
+  body.app-shell::before,
+  body.app-shell::after {
+    display: none;
+  }
+
+  .form-panel {
+    background: Canvas;
+    border: 2px solid CanvasText;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .form-title,
+  .form-subtitle,
+  .section-title,
+  .field-label,
+  .group-legend,
+  .choice-text {
+    color: CanvasText;
+  }
+
+  .field-control {
+    color: FieldText;
+    background: Field;
+    border-color: ButtonText;
+    box-shadow: none;
+  }
+
+  .choice-chip {
+    background: Canvas;
+    border-color: ButtonText;
+  }
+
+  .field-message {
+    color: CanvasText;
+  }
+
+  .strength-track {
+    background: Canvas;
+    border: 1px solid ButtonText;
+  }
+
+  .btn-submit {
+    color: ButtonText;
+    background: ButtonFace;
+    border: 1px solid ButtonText;
+    box-shadow: none;
+  }
+
+  .form-success {
+    color: CanvasText;
+    background: Canvas;
+    border-color: ButtonText;
+  }
+
+  #formulario::-webkit-scrollbar-thumb,
+  #formulario.scroll-auto-hide::-webkit-scrollbar-thumb {
+    background-color: ButtonText;
+  }
+
+  @supports (-moz-appearance: none) {
+    #formulario,
+    #formulario.scroll-auto-hide {
+      scrollbar-color: ButtonText Canvas;
+    }
+  }
 }

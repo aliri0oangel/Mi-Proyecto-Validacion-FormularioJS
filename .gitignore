@@ -1,0 +1,12 @@
+# Dependencias de desarrollo (solo tooling: ESLint / Tailwind CLI)
+node_modules/
+
+# Artefactos de build de CSS (se regenera con `npm run build:css`)
+# Se comenta la siguiente linea si prefieres versionar tailwind.css en el repo:
+# dist/
+
+# Editores y SO
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

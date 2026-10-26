@@ -3,363 +3,426 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      CSP estricta: el CSS es un archivo local precompilado (tailwind.css)
+      y los scripts son locales, por eso no se necesita 'unsafe-inline'.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; base-uri 'none'; form-action 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:"
+    />
     <title>Formulario de Registro</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Tailwind precompilado en build (npm run build:css); sin CDN en runtime -->
+    <link rel="stylesheet" href="./tailwind.css" />
     <link rel="stylesheet" href="./estilos-puntuales.css" />
   </head>
-  <body class="bg-[#e8f0fe] min-h-screen flex items-center justify-center p-4">
+  <body class="app-shell">
+    <!-- novalidate: toda la validacion se maneja en JavaScript para
+         mostrar mensajes propios en lugar de los tooltips del navegador. -->
     <form
       action=""
       id="formulario"
-      class="bg-[#fffdf7] rounded-2xl shadow-lg p-4 sm:p-8 w-full max-w-2xl"
+      novalidate
+      class="form-panel"
     >
       <!-- Titulo -->
-      <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold text-[#3d4f6f]">
+      <div class="form-header">
+        <h1 class="form-title">
           Formulario de Registro
         </h1>
-        <p class="text-[#8e9bb5] mt-1">
+        <p class="form-subtitle">
           Completa todos los campos para registrarte e ingresar a nuestra academia
         </p>
       </div>
 
       <!-- Seccion: Datos Personales -->
       <div class="mb-6">
-        <h2 class="text-sm font-semibold text-[#7ba7d7] uppercase tracking-wide mb-4">
+        <h2 class="section-title">
           Datos Personales
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Nombre -->
           <div>
-            <label for="nombre" class="block text-sm font-medium text-[#3d4f6f] mb-1">Nombre</label>
+            <label for="nombre" class="field-label">Nombre</label>
             <input
               type="text"
               placeholder="Nombre"
               id="nombre"
               name="nombre"
-              class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+              maxlength="20"
+              autocomplete="given-name"
+              aria-describedby="mensaje_nombre"
+              class="field-control"
             />
-            <div id="mensaje_nombre" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+            <div id="mensaje_nombre" class="field-message hidden"></div>
           </div>
 
           <!-- Apellido -->
           <div>
-            <label for="apellido" class="block text-sm font-medium text-[#3d4f6f] mb-1">Apellido</label>
+            <label for="apellido" class="field-label">Apellido</label>
             <input
               type="text"
               placeholder="Apellido"
               id="apellido"
               name="apellido"
-              class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+              maxlength="20"
+              autocomplete="family-name"
+              aria-describedby="mensaje_apellido"
+              class="field-control"
             />
-            <div id="mensaje_apellido" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+            <div id="mensaje_apellido" class="field-message hidden"></div>
           </div>
         </div>
 
         <!-- Cedula -->
         <div class="mt-4">
-          <label for="cedula" class="block text-sm font-medium text-[#3d4f6f] mb-1">Cedula de identidad</label>
+          <label for="cedula" class="field-label">Cedula de identidad</label>
           <input
             type="text"
-            placeholder="V2804716 o E32648512"
+            placeholder="V-2804716, E-32648512 o solo digitos"
             id="cedula"
             name="cedula"
-            class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+            maxlength="11"
+            autocomplete="off"
+            aria-describedby="mensaje_cedula"
+            class="field-control"
           />
-          <div id="mensaje_cedula" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+          <div id="mensaje_cedula" class="field-message hidden"></div>
         </div>
 
         <!-- Fecha de nacimiento -->
         <div class="mt-4">
-          <label for="nacimiento" class="block text-sm font-medium text-[#3d4f6f] mb-1">Fecha de nacimiento</label>
+          <label for="nacimiento" class="field-label">Fecha de nacimiento</label>
           <input
             type="date"
             id="nacimiento"
             name="nacimiento"
-            class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+            autocomplete="bday"
+            aria-describedby="mensaje_nacimiento"
+            class="field-control"
           />
-          <div id="mensaje_nacimiento" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+          <div id="mensaje_nacimiento" class="field-message hidden"></div>
         </div>
       </div>
 
       <!-- Seccion: Contacto -->
       <div class="mb-6">
-        <h2 class="text-sm font-semibold text-[#7ba7d7] uppercase tracking-wide mb-4">
+        <h2 class="section-title">
           Contacto
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Correo -->
           <div>
-            <label for="correo" class="block text-sm font-medium text-[#3d4f6f] mb-1">Correo</label>
+            <label for="correo" class="field-label">Correo</label>
             <input
               type="email"
               placeholder="correo@ejemplo.com"
               id="correo"
               name="correo"
-              class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+              maxlength="100"
+              autocomplete="email"
+              aria-describedby="mensaje_correo"
+              class="field-control"
             />
-            <div id="mensaje_correo" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+            <div id="mensaje_correo" class="field-message hidden"></div>
           </div>
 
           <!-- Telefono -->
           <div>
-            <label for="telefono" class="block text-sm font-medium text-[#3d4f6f] mb-1">Telefono</label>
+            <label for="telefono" class="field-label">Telefono</label>
             <input
-              type="text"
+              type="tel"
               placeholder="+584141234567"
               id="telefono"
               name="telefono"
-              class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+              maxlength="13"
+              autocomplete="tel"
+              inputmode="tel"
+              aria-describedby="mensaje_telefono"
+              class="field-control"
             />
-            <div id="mensaje_telefono" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+            <div id="mensaje_telefono" class="field-message hidden"></div>
           </div>
         </div>
       </div>
 
       <!-- Seccion: Ubicacion -->
       <div class="mb-6">
-        <h2 class="text-sm font-semibold text-[#7ba7d7] uppercase tracking-wide mb-4">
+        <h2 class="section-title">
           Ubicacion
         </h2>
 
         <!-- Direccion -->
         <div class="mb-4">
-          <label for="direccion" class="block text-sm font-medium text-[#3d4f6f] mb-1">Direccion de habitacion</label>
+          <label for="direccion" class="field-label">Direccion de habitacion</label>
           <input
             type="text"
             placeholder="Direccion"
             id="direccion"
             name="direccion"
-            class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+            maxlength="150"
+            autocomplete="street-address"
+            aria-describedby="mensaje_direccion"
+            class="field-control"
           />
-          <div id="mensaje_direccion" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+          <div id="mensaje_direccion" class="field-message hidden"></div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Ciudad -->
           <div>
-            <label for="ciudad" class="block text-sm font-medium text-[#3d4f6f] mb-1">Ciudad</label>
+            <label for="ciudad" class="field-label">Ciudad</label>
             <input
               type="text"
               placeholder="Ciudad"
               id="ciudad"
               name="ciudad"
-              class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+              maxlength="20"
+              autocomplete="address-level2"
+              aria-describedby="mensaje_ciudad"
+              class="field-control"
             />
-            <div id="mensaje_ciudad" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+            <div id="mensaje_ciudad" class="field-message hidden"></div>
           </div>
 
           <!-- Pais -->
           <div>
-            <label for="pais" class="block text-sm font-medium text-[#3d4f6f] mb-1">Pais</label>
+            <label for="pais" class="field-label">Pais</label>
             <select
               name="pais"
               id="pais"
-              class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+              autocomplete="country-name"
+              aria-describedby="mensaje_pais"
+              class="field-control"
             >
               <option value="">Seleccione un pais</option>
               <option value="venezuela">Venezuela</option>
               <option value="colombia">Colombia</option>
               <option value="peru">Peru</option>
               <option value="chile">Chile</option>
+              <option value="argentina">Argentina</option>
+              <option value="brasil">Brasil</option>
+              <option value="mexico">Mexico</option>
+              <option value="ecuador">Ecuador</option>
+              <option value="espana">Espana</option>
             </select>
-            <div id="mensaje_pais" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+            <div id="mensaje_pais" class="field-message hidden"></div>
           </div>
         </div>
       </div>
 
       <!-- Seccion: Preferencias -->
       <div class="mb-6">
-        <h2 class="text-sm font-semibold text-[#7ba7d7] uppercase tracking-wide mb-4">
+        <h2 class="section-title">
           Preferencias
         </h2>
 
-        <!-- Genero -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-[#3d4f6f] mb-2">Genero</label>
-          <div class="flex flex-wrap gap-4">
-            <label class="flex items-center gap-2 cursor-pointer">
+        <!-- Genero (fieldset/legend para accesibilidad de grupos) -->
+        <fieldset id="grupo_genero" class="mb-4" aria-describedby="mensaje_genero">
+          <legend class="group-legend">Genero</legend>
+          <div class="choice-list">
+            <label class="choice-chip">
               <input
                 type="radio"
                 name="genero"
                 value="masculino"
                 id="masculino"
-                class="w-4 h-4 text-[#7ba7d7] border-[#c5d3e8] focus:ring-[#7ba7d7]"
+                class="choice-input"
               />
-              <span class="text-[#3d4f6f]">Masculino</span>
+              <span class="choice-text">Masculino</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
+            <label class="choice-chip">
               <input
                 type="radio"
                 name="genero"
                 value="femenino"
                 id="femenino"
-                class="w-4 h-4 text-[#7ba7d7] border-[#c5d3e8] focus:ring-[#7ba7d7]"
+                class="choice-input"
               />
-              <span class="text-[#3d4f6f]">Femenino</span>
+              <span class="choice-text">Femenino</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
+            <label class="choice-chip">
               <input
                 type="radio"
                 name="genero"
-                value="otro"
-                id="otro"
-                class="w-4 h-4 text-[#7ba7d7] border-[#c5d3e8] focus:ring-[#7ba7d7]"
+                value="no_decir"
+                id="no_decir"
+                class="choice-input"
               />
-              <span class="text-[#3d4f6f]">Otro</span>
+              <span class="choice-text">Prefiero no decir</span>
             </label>
           </div>
-          <div id="mensaje_genero" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
-        </div>
+          <div id="mensaje_genero" class="field-message hidden"></div>
+        </fieldset>
 
-        <!-- Modalidad -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-[#3d4f6f] mb-2">Modalidad de estudio</label>
-          <div class="flex flex-wrap gap-4">
-            <label class="flex items-center gap-2 cursor-pointer">
+        <!-- Modalidad de estudio -->
+        <fieldset id="grupo_modalidad" class="mb-4" aria-describedby="mensaje_modalidad">
+          <legend class="group-legend">Modalidad de estudio</legend>
+          <div class="choice-list">
+            <label class="choice-chip">
+              <input
+                type="radio"
+                name="modalidad"
+                value="online"
+                id="online"
+                class="choice-input"
+              />
+              <span class="choice-text">Online</span>
+            </label>
+            <label class="choice-chip">
               <input
                 type="radio"
                 name="modalidad"
                 value="presencial"
                 id="presencial"
-                class="w-4 h-4 text-[#7ba7d7] border-[#c5d3e8] focus:ring-[#7ba7d7]"
+                class="choice-input"
               />
-              <span class="text-[#3d4f6f]">Presencial</span>
+              <span class="choice-text">Presencial</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
+            <label class="choice-chip">
               <input
                 type="radio"
                 name="modalidad"
-                value="virtual"
-                id="virtual"
-                class="w-4 h-4 text-[#7ba7d7] border-[#c5d3e8] focus:ring-[#7ba7d7]"
+                value="hibrida"
+                id="hibrida"
+                class="choice-input"
               />
-              <span class="text-[#3d4f6f]">Virtual</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="modalidad"
-                value="mixto"
-                id="mixto"
-                class="w-4 h-4 text-[#7ba7d7] border-[#c5d3e8] focus:ring-[#7ba7d7]"
-              />
-              <span class="text-[#3d4f6f]">Mixto</span>
+              <span class="choice-text">Hibrida</span>
             </label>
           </div>
-          <div id="mensaje_modalidad" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
-        </div>
+          <div id="mensaje_modalidad" class="field-message hidden"></div>
+        </fieldset>
 
-        <!-- Areas de interes -->
-        <div>
-          <label class="block text-sm font-medium text-[#3d4f6f] mb-2">Areas de interes</label>
-          <div class="flex flex-wrap gap-4">
-            <label class="flex items-center gap-2 cursor-pointer">
+        <!-- Areas de interes (minimo 1, maximo 3) -->
+        <fieldset id="grupo_interes" aria-describedby="mensaje_interes">
+          <legend class="group-legend">Areas de interes (minimo 1, maximo 3)</legend>
+          <div class="choice-list">
+            <label class="choice-chip">
               <input
                 type="checkbox"
                 name="interes"
                 value="frontend"
                 id="frontend"
-                class="w-4 h-4 text-[#7ba7d7] border-[#c5d3e8] rounded focus:ring-[#7ba7d7]"
+                class="choice-input"
               />
-              <span class="text-[#3d4f6f]">Frontend</span>
+              <span class="choice-text">Frontend</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
+            <label class="choice-chip">
               <input
                 type="checkbox"
                 name="interes"
                 value="backend"
                 id="backend"
-                class="w-4 h-4 text-[#7ba7d7] border-[#c5d3e8] rounded focus:ring-[#7ba7d7]"
+                class="choice-input"
               />
-              <span class="text-[#3d4f6f]">Backend</span>
+              <span class="choice-text">Backend</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
+            <label class="choice-chip">
               <input
                 type="checkbox"
                 name="interes"
-                value="robotica"
-                id="robotica"
-                class="w-4 h-4 text-[#7ba7d7] border-[#c5d3e8] rounded focus:ring-[#7ba7d7]"
+                value="diseno_uiux"
+                id="diseno_uiux"
+                class="choice-input"
               />
-              <span class="text-[#3d4f6f]">Robotica</span>
+              <span class="choice-text">Diseno UI-UX</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
+            <label class="choice-chip">
               <input
                 type="checkbox"
                 name="interes"
                 value="inteligencia_artificial"
                 id="inteligencia_artificial"
-                class="w-4 h-4 text-[#7ba7d7] border-[#c5d3e8] rounded focus:ring-[#7ba7d7]"
+                class="choice-input"
               />
-              <span class="text-[#3d4f6f]">Inteligencia Artificial</span>
+              <span class="choice-text">Inteligencia Artificial</span>
+            </label>
+            <label class="choice-chip">
+              <input
+                type="checkbox"
+                name="interes"
+                value="bases_datos"
+                id="bases_datos"
+                class="choice-input"
+              />
+              <span class="choice-text">Bases de datos</span>
             </label>
           </div>
-          <div id="mensaje_interes" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
-        </div>
+          <div id="mensaje_interes" class="field-message hidden"></div>
+        </fieldset>
       </div>
 
       <!-- Seccion: Seguridad -->
       <div class="mb-6">
-        <h2 class="text-sm font-semibold text-[#7ba7d7] uppercase tracking-wide mb-4">
+        <h2 class="section-title">
           Seguridad
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Contrasena -->
+          <!-- Contrasena + indicador de fortaleza -->
           <div>
-            <label for="pass" class="block text-sm font-medium text-[#3d4f6f] mb-1">Contrasena</label>
+            <label for="pass" class="field-label">Contrasena</label>
             <input
               type="password"
               placeholder="Contrasena"
               id="pass"
               name="pass"
-              class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+              maxlength="50"
+              autocomplete="new-password"
+              aria-describedby="mensaje_pass fortaleza_pass"
+              class="field-control"
             />
-            <div id="mensaje_pass" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+            <div id="mensaje_pass" class="field-message hidden"></div>
+
+            <!-- Indicador de fortaleza (punto extra del enunciado) -->
+            <div id="fortaleza_pass" class="mt-2 hidden" role="status">
+              <div class="strength-track">
+                <div id="fortaleza_barra" class="fortaleza-barra"></div>
+              </div>
+              <p id="fortaleza_texto" class="strength-text"></p>
+            </div>
           </div>
 
           <!-- Confirmar contrasena -->
           <div>
-            <label for="pass2" class="block text-sm font-medium text-[#3d4f6f] mb-1">Confirmar contrasena</label>
+            <label for="pass2" class="field-label">Confirmar contrasena</label>
             <input
               type="password"
               placeholder="Contrasena"
               id="pass2"
               name="pass2"
-              class="w-full px-4 py-2 border border-[#c5d3e8] rounded-lg bg-[#f0f4fa] focus:border-[#7ba7d7] focus:ring-2 focus:ring-[#dce8f5] transition-colors duration-200 outline-none"
+              maxlength="50"
+              autocomplete="new-password"
+              aria-describedby="mensaje_pass2"
+              class="field-control"
             />
-            <div id="mensaje_pass2" class="text-[#d46a6a] text-sm mt-1 hidden"></div>
+            <div id="mensaje_pass2" class="field-message hidden"></div>
           </div>
         </div>
       </div>
 
       <!-- Terminos y condiciones -->
       <div class="mb-6">
-        <label class="flex items-start gap-2 cursor-pointer">
+        <label class="terms-label">
           <input
             type="checkbox"
             name="terminos"
             id="terminos"
-            class="w-4 h-4 mt-0.5 text-[#7ba7d7] border-[#c5d3e8] rounded focus:ring-[#7ba7d7]"
+            aria-describedby="mensaje_terminos"
+            class="choice-input"
           />
-          <span class="text-[#3d4f6f]">Acepto los terminos y condiciones</span>
+          <span class="choice-text">Acepto los terminos y condiciones</span>
         </label>
-        <div id="mensaje_terminos" class="text-[#d46a6a] text-sm mt-1 ml-6 hidden"></div>
-      </div>
-
-      <!-- Mensaje de error general -->
-      <div class="mb-4">
-        <div id="error_mensajes" class="text-[#d46a6a] text-sm text-center font-medium hidden"></div>
+        <div id="mensaje_terminos" class="field-message terms-message hidden"></div>
       </div>
 
       <!-- Boton de envio -->
       <div class="mb-4">
         <button
           type="submit"
-          class="w-full bg-[#7ba7d7] hover:bg-[#6a96c6] text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg cursor-pointer"
+          class="btn-submit"
         >
           Enviar
         </button>
@@ -369,13 +432,17 @@
       <div>
         <p
           id="mensaje_exito_form"
-          class="text-[#5a9e6f] text-center font-medium hidden"
+          role="status"
+          class="form-success hidden"
         >
-          Formulario enviado correctamente.
+          ✅ Envío exitoso
         </p>
       </div>
     </form>
 
-    <script src="./validacion_form.js"></script>
+    <!-- Orden de carga: logica pura -> presentacion -> orquestacion -->
+    <script src="./validators.js" defer></script>
+    <script src="./form_ui.js" defer></script>
+    <script src="./validacion_form.js" defer></script>
   </body>
 </html>

@@ -1,0 +1,7 @@
+/* Entrada de build de Tailwind v4. Genera tailwind.css (estatico).
+   Uso: npm run build:css
+   El CSS resultante se sirve como archivo local (sin CDN en runtime). */
+@import "tailwindcss";
+
+/* Analiza unicamente el HTML del proyecto. */
+@source "./form.html";

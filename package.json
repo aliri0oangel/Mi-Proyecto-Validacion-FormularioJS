@@ -1,0 +1,17 @@
+{
+  "name": "formulario-registro",
+  "version": "1.0.0",
+  "description": "Formulario de registro validado en JavaScript vanilla (estatico, sin bundler). Solo tooling de desarrollo.",
+  "private": true,
+  "scripts": {
+    "lint": "eslint .",
+    "build:css": "tailwindcss -i ./tailwind.input.css -o ./tailwind.css --minify"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/cli": "^4.3.3",
+    "eslint": "^10.13.0",
+    "tailwindcss": "^4.3.3"
+  }
+}
